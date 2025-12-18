@@ -17,6 +17,8 @@ app.use((req, res, next) => {
 
 app.use("/api", scriptRoutes);
 
-app.listen(5000, () => {
-  console.log("Backend running on http://localhost:5000");
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
 });
