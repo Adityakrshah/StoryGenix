@@ -13,26 +13,30 @@ export default function App() {
   const normalizedLanguage =
   language.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
 
+const generateScript = async () => {
+  if (!prompt.trim()) return alert("Enter a prompt");
 
-  const generateScript = async () => {
-    if (!prompt.trim()) return alert("Enter a prompt");
+  setLoading(true);
+  setScript("");
 
-    setLoading(true);
-    setScript("");
-
-    try {
-      const res = await axios.post("http://localhost:5000/api/generate-script", {
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/generate-script`,
+      {
         prompt: `${prompt}. Mood: ${mood}`,
         language,
-      });
+      }
+    );
 
-      setScript(res.data.script);
-    } catch (err) {
-      alert("Failed to generate script");
-    }
+    setScript(res.data.script);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to generate script");
+  }
 
-    setLoading(false);
-  };
+  setLoading(false);
+};
+
 
   return (
     <div className="min-h-screen text-white flex flex-col relative overflow-hidden backdrop-blur-sm bg-black/40 rounded-xl
@@ -76,39 +80,38 @@ export default function App() {
         />
 
         {/* Controls */}
-        <div className="flex gap-4 mt-4">
+        <div className="flex flex-col sm:flex-row gap-4 mt-4 w-full max-w-3xl">
 
-          {/* Mood Dropdown */}
-          <select
-            className="bg-neutral-900 border border-neutral-700 px-4 py-2 rounded-lg"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
-          >
-            <option>Emotional</option>
-            <option>Action</option>
-            <option>Horror</option>
-            <option>Fantasy</option>
-            <option>Sci-Fi</option>
-            <option>Comedy</option>
-          </select>
+  <select
+    className="bg-neutral-900 border border-neutral-700 px-4 py-2 rounded-lg w-full sm:w-auto"
+    value={mood}
+    onChange={(e) => setMood(e.target.value)}
+  >
+    <option>Emotional</option>
+    <option>Action</option>
+    <option>Horror</option>
+    <option>Fantasy</option>
+    <option>Sci-Fi</option>
+    <option>Comedy</option>
+  </select>
 
-          {/* Language Dropdown */}
-          <input
-            type="text"
-            placeholder="Language (e.g. English, Hindi, Nepali)"
-            className="bg-neutral-900 border border-neutral-700 px-4 py-2 rounded-lg w-56"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-          />
+  <input
+    type="text"
+    placeholder="Language"
+    className="bg-neutral-900 border border-neutral-700 px-4 py-2 rounded-lg w-full sm:w-56"
+    value={language}
+    onChange={(e) => setLanguage(e.target.value)}
+  />
 
-          {/* Generate Button */}
-          <button
-            onClick={generateScript}
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold"
-          >
-            {loading ? "Generating..." : "Generate"}
-          </button>
-        </div>
+  <button
+    onClick={generateScript}
+    className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-semibold w-full sm:w-auto"
+  >
+    {loading ? "Generating..." : "Generate"}
+  </button>
+
+</div>
+
 
         {/* Output */}
         {script && (
@@ -124,7 +127,8 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-800 text-sm text-neutral-500">
-  <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+  <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row gap-6 md:items-center md:justify-between text-center md:text-left">
+
 
     {/* Left */}
     <div className="text-xs text-neutral-600">
