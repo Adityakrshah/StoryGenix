@@ -1,5 +1,5 @@
 import { generateAIScript } from "../services/aiService.js";
-import Script from "../models/Scripts.js";
+import Script from "../models/scripts.js";
 
 export async function createScript(req, res) {
   try {
