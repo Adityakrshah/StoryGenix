@@ -1,16 +1,16 @@
 import { Routes, Route } from "react-router-dom";
 
-import AppLayout from "../components/layouts/AppLayout";
-import ProtectedRoute from "./ProtectedRoutes";
+import AppLayout from "../components/layouts/AppLayout.jsx";
+import ProtectedRoute from "./ProtectedRoutes.jsx";
 
-import Landing from "../pages/Landing";
-import Login from "../pages/Login";
-import Signup from "../pages/Signup";
-import Home from "../pages/Home";
-import History from "../pages/History";
-import Profile from "../pages/Profile";
-import About from "../pages/About";
-import NotFound from "../pages/NotFound";
+import Landing from "../pages/Landing.jsx";
+import Login from "../pages/Login.jsx";
+import Signup from "../pages/Signup.jsx";
+import Home from "../pages/Home.jsx";
+import History from "../pages/History.jsx";
+import Profile from "../pages/Profile.jsx";
+import About from "../pages/About.jsx";
+import NotFound from "../pages/NotFound.jsx";
 
 export default function AppRoutes() {
   return (
