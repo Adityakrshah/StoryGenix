@@ -9,8 +9,8 @@ export default function Landing() {
 
       {/* HERO */}
       <section className="min-h-screen flex flex-col justify-center items-center max-w-4xl">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Create <span className="text-blue-500">Cinematic Stories</span>
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-neutral-500">
+          Create <span className="text-blue-500 ">Cinematic Stories</span>
           <br /> with AI
         </h1>
 
@@ -29,7 +29,7 @@ export default function Landing() {
 
           <button
             onClick={() => navigate("/login")}
-            className="border border-neutral-600 hover:bg-neutral-800 px-6 py-3 rounded-lg font-semibold"
+            className="border border-neutral-600 hover:bg-neutral-800 px-6 py-3 rounded-lg font-semibold text-neutral-500 "
           >
             Login
           </button>
@@ -37,7 +37,7 @@ export default function Landing() {
       </section>
 
       {/* FEATURES */}
-      <section className="max-w-6xl w-full py-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <section className="max-w-6xl w-full py-24 grid grid-cols-1 md:grid-cols-3 gap-8 text-neutral-500">
         <Feature
           icon={<FaMagic />}
           title="AI-Powered Writing"
@@ -56,7 +56,7 @@ export default function Landing() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="max-w-4xl py-24">
+      <section className="max-w-4xl py-24 text-neutral-500">
         <h2 className="text-3xl font-semibold mb-10">How It Works</h2>
 
         <div className="space-y-6 text-neutral-400 text-lg">
@@ -69,10 +69,10 @@ export default function Landing() {
 
       {/* FINAL CTA */}
       <section className="py-24">
-        <h2 className="text-3xl font-semibold">
+        <h2 className="text-3xl font-semibold text-neutral-500">
           Turn Ideas into Stories
         </h2>
-        <p className="mt-4 text-neutral-400">
+        <p className="mt-4 text-neutral-400 text-neutral-500">
           Start your cinematic journey today.
         </p>
 

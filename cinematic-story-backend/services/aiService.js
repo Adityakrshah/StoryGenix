@@ -1,8 +1,13 @@
 import axios from "axios";
 
 export async function generateAIScript(prompt, language) {
-  console.log("🔑 API KEY loaded?", process.env.GROQ_API_KEY ? "YES" : "NO");
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("Groq API key not configured");
+  }
+
+  console.log("🔑 API KEY loaded? YES");
   console.log("🚀 Sending request to Groq API...");
+
 
   try {
     const response = await axios.post(
