@@ -10,28 +10,23 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS (MUST be before routes)
+// ✅ CORS (this alone is enough)
 app.use(cors({
   origin: [
     "http://localhost:5173",
     "https://story-genix.vercel.app"
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ Handle preflight
-app.options("*", cors());
-
-// ✅ Body parser
 app.use(express.json());
 
-// ✅ Routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api", scriptRoutes);
 
-// ✅ MongoDB
+// MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Atlas connected"))
@@ -40,7 +35,7 @@ mongoose
     process.exit(1);
   });
 
-// ✅ Port (Render provides PORT)
+// Port
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>
   console.log(`Backend running on port ${PORT}`)
