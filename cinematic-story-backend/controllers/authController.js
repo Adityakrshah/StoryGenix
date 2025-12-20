@@ -30,15 +30,15 @@ export const signup = async (req, res) => {
         email: user.email,
       },
     });
-  } catch (err) {
-  console.error("SIGNUP ERROR:", err);
-  res.status(500).json({
-    message: "Signup failed",
-    error: err.message,
-  });
-}
-
+    } catch (err) {
+    console.error("SIGNUP ERROR:", err);
+    res.status(500).json({
+      message: "Signup failed",
+      error: err.message,
+    });
+  }
 };
+
 
 // LOGIN
 export const login = async (req, res) => {

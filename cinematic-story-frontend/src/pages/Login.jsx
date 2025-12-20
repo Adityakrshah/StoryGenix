@@ -35,12 +35,10 @@ export default function Login() {
       // 🚀 Redirect to home
       navigate("/home");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
-    } finally {
-      setLoading(false);
-    }
+  console.error("LOGIN ERROR:", err.message);
+  res.status(500).json({ message: "Login failed" });
+}
+
   };
 
   return (
