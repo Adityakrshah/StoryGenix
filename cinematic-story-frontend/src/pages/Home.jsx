@@ -1,8 +1,13 @@
-import { useState, useMemo } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
 import api from "../services/api";
 import { Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+
+
+
 
 
 import { marked } from "marked";
@@ -18,7 +23,7 @@ export default function Home() {
   
   const [history, setHistory] = useState([]);
   
-
+const navigate = useNavigate();
 
 const filteredHistory = useMemo(() => {
   if (!search.trim()) return [];
@@ -83,8 +88,10 @@ useEffect(() => {
 
 
   return (
-    <div className="w-full flex justify-center py-10 px-4">
-      <div className="w-full max-w-4xl flex flex-col gap-6">
+    <div className="w-full flex justify-center py-6 sm:py-10 px-3 sm:px-4">
+
+      <div className="w-full max-w-4xl flex flex-col gap-4 sm:gap-6">
+
         {/* Left Drawer */}
 {drawerOpen && (
   <div className="fixed inset-0 z-50 flex text-neutral-200">
@@ -96,7 +103,8 @@ useEffect(() => {
     />
 
     {/* Drawer */}
-    <div className="relative w-64 bg-neutral-900 border-r border-neutral-700 p-4">
+    <div className="relative w-64 max-w-[80vw] bg-neutral-900 border-r border-neutral-700 p-4">
+
       <h2 className="text-lg font-semibold mb-6">StoryGenix</h2>
 
       <div className="flex flex-col gap-3 text-sm">
@@ -114,22 +122,25 @@ useEffect(() => {
         </button>
 
         <button
-          onClick={() => {
-            window.location.href = "/history";
-          }}
-          className="text-left px-3 py-2 rounded hover:bg-neutral-800"
-        >
-          🕒 History
-        </button>
+  onClick={() => {
+    navigate("/history");
+    setDrawerOpen(false);
+  }}
+  className="text-left px-3 py-2 rounded hover:bg-neutral-800"
+>
+  🕒 History
+</button>
 
-        <button
-          onClick={() => {
-            window.location.href = "/about";
-          }}
-          className="text-left px-3 py-2 rounded hover:bg-neutral-800"
-        >
-          ℹ️ About
-        </button>
+<button
+  onClick={() => {
+    navigate("/about");
+    setDrawerOpen(false);
+  }}
+  className="text-left px-3 py-2 rounded hover:bg-neutral-800"
+>
+  ℹ️ About
+</button>
+
 
       </div>
     </div>
@@ -140,7 +151,8 @@ useEffect(() => {
 
 
        {/* 🔝 Top Utility Bar */}
-<div className="grid grid-cols-3 items-center gap-4">
+<div className="flex flex-col sm:grid sm:grid-cols-3 items-center gap-4">
+
   
 
   {/* ☰ Drawer (left) */}
@@ -155,7 +167,8 @@ useEffect(() => {
 
   {/* 🔍 Search (center) */}
  {/* 🔍 Search Bar */}
-<div className="flex items-center gap-2 w-full max-w-xl justify-self-center">
+<div className="flex items-center gap-2 w-full sm:max-w-xl justify-self-center">
+
 
   <input
     type="text"
@@ -221,7 +234,7 @@ useEffect(() => {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Write a cinematic prompt..."
-          className="w-full h-44 bg-neutral-900 border border-neutral-700 px-5 py-4 rounded-xl
+          className="w-full h-36 sm:h-44 bg-neutral-900 border border-neutral-700 px-5 py-4 rounded-xl
                      text-white placeholder-neutral-500 resize-none
                      focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
