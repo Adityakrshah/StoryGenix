@@ -10,23 +10,34 @@ export async function createScript(req, res) {
       return res.status(400).json({ message: "Invalid request" });
     }
 
-    const script = await generateAIScript(prompt, language);
+    // Generate AI script
+    const aiScript = await generateAIScript(prompt, language);
 
-    await Script.create({
+    // Save script with versions
+    const savedScript = await Script.create({
       userId,
       prompt,
       language,
       mood,
-      script,
+      versions: [
+        {
+          content: aiScript,
+          editedFrom: null,
+        },
+      ],
     });
 
-    res.json({ script });
+    // ✅ Send response ONCE, after save
+    res.json({
+      script: aiScript,
+      scriptId: savedScript._id,
+    });
+
   } catch (error) {
-    console.log("❌ Controller Error:", error.message);
+    console.error("❌ Controller Error:", error.message);
     res.status(500).json({ error: "AI failed to generate script" });
   }
 }
-
 export async function getHistory(req, res) {
   try {
     const userId = req.userId;
@@ -36,11 +47,10 @@ export async function getHistory(req, res) {
 
     res.json(scripts);
   } catch (error) {
-    console.log("❌ History Error:", error.message);
+    console.error("❌ History Error:", error.message);
     res.status(500).json({ error: "Failed to fetch history" });
   }
 }
-
 export async function deleteScript(req, res) {
   try {
     const { id } = req.params;
@@ -61,3 +71,53 @@ export async function deleteScript(req, res) {
     res.status(500).json({ message: "Failed to delete script" });
   }
 }
+export async function editScript(req, res) {
+  try {
+    const { id } = req.params; // scriptId
+    const { editedPrompt, language } = req.body;
+    const userId = req.userId;
+
+    if (!editedPrompt) {
+      return res.status(400).json({ message: "Edited prompt required" });
+    }
+
+    const scriptDoc = await Script.findOne({
+      _id: id,
+      userId,
+    });
+
+    if (!scriptDoc) {
+      return res.status(404).json({ message: "Script not found" });
+    }
+
+    // Get last version
+    const lastVersion =
+      scriptDoc.versions[scriptDoc.versions.length - 1];
+
+    // Generate new AI script based on edited prompt
+    const newScript = await generateAIScript(
+      editedPrompt,
+      language || scriptDoc.language
+    );
+
+    // Push new version
+    scriptDoc.versions.push({
+      content: newScript,
+      editedFrom: lastVersion._id,
+    });
+
+    await scriptDoc.save();
+
+    res.json({
+      message: "Script updated successfully",
+      newVersion: newScript,
+      previousVersion: lastVersion.content,
+    });
+  } catch (error) {
+    console.error("Edit script error:", error.message);
+    res.status(500).json({ message: "Failed to edit script" });
+  }
+}
+
+
+

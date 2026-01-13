@@ -20,7 +20,9 @@ export default function Home() {
   const [script, setScript] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState("");
-  
+  const [editing, setEditing] = useState(false);
+  const [editInstruction, setEditInstruction] = useState("");
+  const [currentScriptId, setCurrentScriptId] = useState(null);
   const [history, setHistory] = useState([]);
   
 const navigate = useNavigate();
@@ -68,7 +70,10 @@ useEffect(() => {
 });
 
 
+
       setScript(res.data.script);
+setCurrentScriptId(res.data.scriptId);
+
    
 
     } catch (err) {
@@ -77,6 +82,36 @@ useEffect(() => {
       setLoading(false);
     }
   };
+const handleEditScript = async () => {
+  console.log("EDIT BUTTON CLICKED");
+  console.log("currentScriptId:", currentScriptId);
+
+  if (!editInstruction.trim() || !currentScriptId) return;
+
+  try {
+    setLoading(true);
+
+    const res = await api.post(
+      `/api/scripts/${currentScriptId}/edit`,
+      {
+        editedPrompt: editInstruction,
+        language,
+      }
+    );
+
+    // Update script with edited version
+    setScript(res.data.newVersion);
+
+    // Reset edit UI
+    setEditing(false);
+    setEditInstruction("");
+
+  } catch (err) {
+    console.error("Edit failed", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
  const resetHome = () => {
   setPrompt("");
@@ -110,16 +145,17 @@ useEffect(() => {
       <div className="flex flex-col gap-3 text-sm">
 
         <button
-          onClick={() => {
-            setPrompt("");
-            setScript("");
-            setSearch("");
-            setDrawerOpen(false);
-          }}
-          className="text-left px-3 py-2 rounded hover:bg-neutral-800"
-        >
-          ➕ New Script
-        </button>
+  onClick={() => {
+    resetHome();
+    setCurrentScriptId(null);
+    setEditing(false);
+    setDrawerOpen(false);
+  }}
+  className="text-left px-3 py-2 rounded hover:bg-neutral-800"
+>
+  ➕ New Script
+</button>
+
 
         <button
   onClick={() => {
@@ -209,11 +245,16 @@ useEffect(() => {
         key={item._id}
         className="p-3 rounded-lg bg-neutral-800
                    hover:bg-neutral-700 cursor-pointer transition"
-        onClick={() => {
-          setScript(item.script);
-          setPrompt(item.prompt);
-          setSearch("");
-        }}
+      onClick={() => {
+  const latest =
+    item.versions[item.versions.length - 1].content;
+
+  setScript(latest);
+  setPrompt(item.prompt);
+  setCurrentScriptId(item._id);
+  setSearch("");
+}}
+
       >
         <p className="text-sm text-neutral-200 font-medium">
           {item.prompt}
@@ -285,14 +326,58 @@ useEffect(() => {
 
         {/* 📜 Output */}
         {script && (
-  <div
-    className="bg-neutral-900 border border-neutral-700 rounded-xl p-6
-               whitespace-pre-wrap leading-relaxed text-neutral-400"
-    dangerouslySetInnerHTML={{
-      __html: marked(script),
-    }}
-  />
+  <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 space-y-4">
+
+    {/* Script content */}
+    <div
+      className="whitespace-pre-wrap leading-relaxed text-neutral-300"
+      dangerouslySetInnerHTML={{
+        __html: marked(script),
+      }}
+    />
+
+    {/* Edit button */}
+    <button
+      onClick={() => setEditing(true)}
+      className="text-sm text-blue-400 hover:underline"
+    >
+      ✏️ Edit this script
+    </button>
+
+  </div>
 )}
+{editing && (
+  <div className="bg-neutral-800 border border-neutral-700 rounded-xl p-4 space-y-3">
+    
+    <textarea
+      placeholder="Describe what you want to change (e.g. make it darker, add suspense, shorten ending)"
+      value={editInstruction}
+      onChange={(e) => setEditInstruction(e.target.value)}
+      className="w-full h-28 bg-neutral-900 border border-neutral-700 p-3 rounded-lg
+                 text-white placeholder-neutral-500 focus:outline-none"
+    />
+
+    <div className="flex gap-3">
+      <button
+        onClick={handleEditScript}
+        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm"
+      >
+        Generate Edited Version
+      </button>
+
+      <button
+        onClick={() => {
+          setEditing(false);
+          setEditInstruction("");
+        }}
+        className="text-sm text-neutral-400 hover:text-neutral-200"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
 
 
       </div>

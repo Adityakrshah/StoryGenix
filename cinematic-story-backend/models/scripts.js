@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const versionSchema = new mongoose.Schema(
+  {
+    content: {
+      type: String,
+      required: true,
+    },
+    editedFrom: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+  },
+  { timestamps: true }
+);
+
 const scriptSchema = new mongoose.Schema(
   {
     userId: {
@@ -13,9 +27,9 @@ const scriptSchema = new mongoose.Schema(
     },
     mood: String,
     language: String,
-    script: {
-      type: String,
-      required: true,
+    versions: {
+      type: [versionSchema],
+      default: [],
     },
   },
   { timestamps: true }
