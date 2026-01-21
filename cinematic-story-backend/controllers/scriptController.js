@@ -73,7 +73,7 @@ export async function deleteScript(req, res) {
 }
 export async function editScript(req, res) {
   try {
-    const { id } = req.params; // scriptId
+    const { id } = req.params;
     const { editedPrompt, language } = req.body;
     const userId = req.userId;
 
@@ -81,29 +81,47 @@ export async function editScript(req, res) {
       return res.status(400).json({ message: "Edited prompt required" });
     }
 
-    const scriptDoc = await Script.findOne({
-      _id: id,
-      userId,
-    });
-
+    const scriptDoc = await Script.findOne({ _id: id, userId });
     if (!scriptDoc) {
       return res.status(404).json({ message: "Script not found" });
     }
 
-    // Get last version
     const lastVersion =
       scriptDoc.versions[scriptDoc.versions.length - 1];
 
-    // Generate new AI script based on edited prompt
+    const editAwarePrompt = `
+EDIT MODE: STRICT (DO NOT REWRITE)
+
+You are editing an EXISTING script.
+You MUST treat the original script as the base text.
+
+ORIGINAL_SCRIPT (BASE TEXT — DO NOT REPLACE):
+---------------------------------------------
+${lastVersion.content}
+---------------------------------------------
+
+EDIT_REQUEST (APPLY ONLY THIS):
+"${editedPrompt}"
+
+STRICT RULES:
+1. Start from ORIGINAL_SCRIPT exactly as given.
+2. Modify ONLY the parts required by EDIT_REQUEST.
+3. Reuse the same sentences wherever possible.
+4. Do NOT invent a new story, scenes, or structure.
+5. Do NOT rewrite unaffected sections.
+6. Preserve formatting, order, tone, and pacing.
+7. Return the FULL SCRIPT after minimal edits.
+8. If a section is not mentioned, leave it unchanged.
+`;
+
     const newScript = await generateAIScript(
-      editedPrompt,
+      editAwarePrompt,
       language || scriptDoc.language
     );
 
-    // Push new version
     scriptDoc.versions.push({
       content: newScript,
-      editedFrom: lastVersion._id,
+      editPrompt: editedPrompt,
     });
 
     await scriptDoc.save();
@@ -113,11 +131,14 @@ export async function editScript(req, res) {
       newVersion: newScript,
       previousVersion: lastVersion.content,
     });
+
   } catch (error) {
-    console.error("Edit script error:", error.message);
+    console.error("❌ Edit script error:", error);
     res.status(500).json({ message: "Failed to edit script" });
   }
 }
+
+
 
 
 

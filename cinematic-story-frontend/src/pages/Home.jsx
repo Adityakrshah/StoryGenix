@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+import { Copy } from "lucide-react";
 
 
 
@@ -18,7 +19,7 @@ export default function Home() {
   const [mood, setMood] = useState("Emotional");
   const [loading, setLoading] = useState(false);
   const [script, setScript] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState(false);
   const [editInstruction, setEditInstruction] = useState("");
@@ -82,6 +83,18 @@ setCurrentScriptId(res.data.scriptId);
       setLoading(false);
     }
   };
+  const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("✅ Script copied to clipboard");
+  } catch (err) {
+    alert("❌ Failed to copy");
+  }
+};
+console.log("EDIT CLICKED");
+console.log("editInstruction:", editInstruction);
+console.log("currentScriptId:", currentScriptId);
+
 const handleEditScript = async () => {
   console.log("EDIT BUTTON CLICKED");
   console.log("currentScriptId:", currentScriptId);
@@ -127,79 +140,13 @@ const handleEditScript = async () => {
 
       <div className="w-full max-w-4xl flex flex-col gap-4 sm:gap-6">
 
-        {/* Left Drawer */}
-{drawerOpen && (
-  <div className="fixed inset-0 z-50 flex text-neutral-200">
-
-    {/* Overlay */}
-    <div
-      className="absolute inset-0 bg-black/60"
-      onClick={() => setDrawerOpen(false)}
-    />
-
-    {/* Drawer */}
-    <div className="relative w-64 max-w-[80vw] bg-neutral-900 border-r border-neutral-700 p-4">
-
-      <h2 className="text-lg font-semibold mb-6">StoryGenix</h2>
-
-      <div className="flex flex-col gap-3 text-sm">
-
-        <button
-  onClick={() => {
-    resetHome();
-    setCurrentScriptId(null);
-    setEditing(false);
-    setDrawerOpen(false);
-  }}
-  className="text-left px-3 py-2 rounded hover:bg-neutral-800"
->
-  ➕ New Script
-</button>
-
-
-        <button
-  onClick={() => {
-    navigate("/history");
-    setDrawerOpen(false);
-  }}
-  className="text-left px-3 py-2 rounded hover:bg-neutral-800"
->
-  🕒 History
-</button>
-
-<button
-  onClick={() => {
-    navigate("/about");
-    setDrawerOpen(false);
-  }}
-  className="text-left px-3 py-2 rounded hover:bg-neutral-800"
->
-  ℹ️ About
-</button>
-
-
-      </div>
-    </div>
-  </div>
-)}
+   
 
 
 
 
        {/* 🔝 Top Utility Bar */}
 <div className="flex flex-col sm:grid sm:grid-cols-3 items-center gap-4">
-
-  
-
-  {/* ☰ Drawer (left) */}
-  <button
-    onClick={() => setDrawerOpen(true)}
-    className="justify-self-start px-3 py-2 rounded-lg
-               bg-neutral-800 border border-neutral-700
-               hover:bg-neutral-700 transition"
-  >
-    ☰
-  </button>
 
   {/* 🔍 Search (center) */}
  {/* 🔍 Search Bar */}
@@ -341,8 +288,18 @@ const handleEditScript = async () => {
       onClick={() => setEditing(true)}
       className="text-sm text-blue-400 hover:underline"
     >
-      ✏️ Edit this script
+      ✏️ Re-write this script
     </button>
+    <button
+  onClick={() => copyToClipboard(script)}
+  className="flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition"
+  title="Copy script"
+>
+  <Copy size={16} />
+  Copy
+</button>
+
+
 
   </div>
 )}
@@ -364,7 +321,6 @@ const handleEditScript = async () => {
       >
         Generate Edited Version
       </button>
-
       <button
         onClick={() => {
           setEditing(false);

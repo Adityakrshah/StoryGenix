@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import { marked } from "marked";
-
+import { Copy } from "lucide-react";
 
 export default function History() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [search, setSearch] = useState("");
+
+
+const copyToClipboard = async (text) => {
+  await navigator.clipboard.writeText(text);
+};
+
+
+  const getLatestScript = (item) => {
+  if (!item.versions || item.versions.length === 0) return "";
+  return item.versions[item.versions.length - 1].content || "";
+};
 
   useEffect(() => {
     fetchHistory();
@@ -40,11 +51,16 @@ export default function History() {
 
 
   // 🔍 FILTER HISTORY
-  const filteredHistory = history.filter(item =>
+  const filteredHistory = history.filter(item => {
+  const script = getLatestScript(item);
+
+  return (
     item.prompt.toLowerCase().includes(search.toLowerCase()) ||
-    item.script.toLowerCase().includes(search.toLowerCase()) ||
+    script.toLowerCase().includes(search.toLowerCase()) ||
     (item.mood || "").toLowerCase().includes(search.toLowerCase())
   );
+});
+
 
   if (loading) {
     return (
@@ -80,61 +96,104 @@ export default function History() {
           </div>
         )}
 
-        {filteredHistory.map(item => (
-          <div
-            key={item._id}
-            className="bg-neutral-900 border border-neutral-700
-                       rounded-xl p-5 flex flex-col gap-3"
-          >
-            <div className="text-sm text-neutral-400">
-              {new Date(item.createdAt).toLocaleString()}
-            </div>
+        {filteredHistory.map(item => {
+  const original = item.versions?.[0];
+  const edited = item.versions?.[item.versions.length - 1];
 
-            <div className="text-neutral-200 font-medium">
-              Prompt:
-              <span className="text-neutral-300 font-normal">
-                {" "}{item.prompt}
-              </span>
-            </div>
+  return (
+    <div
+      key={item._id}
+      className="bg-neutral-900 border border-neutral-700
+                 rounded-xl p-5 flex flex-col gap-4"
+    >
+      <div className="text-sm text-neutral-400">
+        {new Date(item.createdAt).toLocaleString()}
+      </div>
 
-            <div className="text-sm text-neutral-400">
-              Mood: {item.mood || "—"} | Language: {item.language}
-            </div>
+      <div className="text-neutral-200 font-medium">
+        Prompt:
+        <span className="text-neutral-300 font-normal">
+          {" "}{item.prompt}
+        </span>
+      </div>
 
-            {/* 📜 SCRIPT */}
-            <div
-  className="whitespace-pre-wrap text-neutral-300 border-t border-neutral-700 pt-3"
-  dangerouslySetInnerHTML={{
-    __html: marked(
-      expandedId === item._id
-        ? item.script
-        : item.script.slice(0, 300) + "..."
-    ),
-  }}
-/>
+      <div className="text-sm text-neutral-400">
+        Mood: {item.mood || "—"} | Language: {item.language}
+      </div>
+
+      {/* 🆚 COMPARISON */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Original */}
+        {original && (
+  <div className="border border-neutral-700 rounded-lg p-4">
+    <div className="flex justify-between items-center mb-2">
+      <p className="text-xs text-neutral-400">Original</p>
+
+      <button
+        onClick={() => copyToClipboard(original.content)}
+        className="flex items-center gap-1 text-xs text-green-400 hover:text-green-300"
+        title="Copy original script"
+      >
+        <Copy size={14} />
+        Copy
+      </button>
+    </div>
+
+    <div
+      className="whitespace-pre-wrap text-neutral-300"
+      dangerouslySetInnerHTML={{
+        __html: marked(original.content),
+      }}
+    />
+  </div>
+)}
 
 
-            {/* 🔽 TOGGLE */}
-            <div className="flex gap-4 mt-2">
-  <button
-    onClick={() =>
-      setExpandedId(expandedId === item._id ? null : item._id)
-    }
-    className="text-sm text-blue-400 hover:underline"
-  >
-    {expandedId === item._id ? "Collapse" : "View full script"}
-  </button>
+        {/* Edited */}
+        {edited && edited !== original && (
+  <div className="border border-blue-700 bg-blue-950/20 rounded-lg p-4">
+    <div className="flex justify-between items-center mb-2">
+      <p className="text-xs text-blue-400">Edited</p>
 
-  <button
-    onClick={() => handleDelete(item._id)}
-    className="text-sm text-red-400 hover:underline"
-  >
-    Delete
-  </button>
-</div>
+      <button
+        onClick={() => copyToClipboard(edited.content)}
+        className="flex items-center gap-1 text-xs text-green-400 hover:text-green-300"
+        title="Copy edited script"
+      >
+        <Copy size={14} />
+        Copy
+      </button>
+    </div>
 
-          </div>
-        ))}
+    {edited.editPrompt && (
+      <p className="text-xs text-neutral-400 mb-2 italic">
+        Edit prompt: {edited.editPrompt}
+      </p>
+    )}
+
+    <div
+      className="whitespace-pre-wrap text-neutral-300"
+      dangerouslySetInnerHTML={{
+        __html: marked(edited.content),
+      }}
+    />
+  </div>
+)}
+
+      </div>
+
+      {/* 🗑 DELETE */}
+      <button
+        onClick={() => handleDelete(item._id)}
+        className="text-sm text-red-400 hover:underline self-start"
+      >
+        Delete
+      </button>
+    </div>
+  );
+})}
+
       </div>
     </div>
   );

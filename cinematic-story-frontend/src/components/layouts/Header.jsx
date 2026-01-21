@@ -1,13 +1,19 @@
 import { FaUserCircle } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Menu, ArrowLeftRight } from "lucide-react";
 
-export default function Header() {
+
+export default function Header({ onToggleSidebar, onMobileMenu }) {
+
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const { logout } = useAuth();
+const location = useLocation();
+const showBackButton = location.pathname !== "/home";
 
   const handleLogout = () => {
     logout();
@@ -41,6 +47,34 @@ export default function Header() {
     <header className="h-14 flex items-center justify-between px-6
                        border-b border-neutral-800
                        text-neutral-200 bg-black/40 backdrop-blur-sm">
+                        <div className="flex items-center gap-2">
+                          {showBackButton && (
+  <button
+    onClick={() => navigate(-1)}
+    className="text-neutral-300 hover:text-white transition-transform hover:-translate-x-0.5"
+
+    title="Go back"
+  >
+    <ArrowLeft size={20} />
+  </button>
+)}
+
+
+  {/* Mobile menu button */}
+  <button onClick={onMobileMenu} className="md:hidden">
+  <Menu size={20} />
+</button>
+
+
+  {/* Desktop collapse button
+  <button
+    onClick={onToggleSidebar}
+    className="hidden md:block text-neutral-300 hover:text-white"
+  >
+    ⇔
+  </button> */}
+</div>
+
 
       <h1
         className="font-bold tracking-wide cursor-pointer select-none"
@@ -48,6 +82,7 @@ export default function Header() {
   window.dispatchEvent(new Event("reset-home"));
   navigate("/home");
 }}
+
 
       >
         🎬 StoryGenix
