@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Menu, ArrowLeftRight } from "lucide-react";
-
+import logo from "../Background/logo.png"
 
 export default function Header({ onToggleSidebar, onMobileMenu }) {
 
@@ -76,17 +76,20 @@ const showBackButton = location.pathname !== "/home";
 </div>
 
 
-      <h1
-        className="font-bold tracking-wide cursor-pointer select-none"
-        onClick={() => {
-  window.dispatchEvent(new Event("reset-home"));
-  navigate("/home");
-}}
+<h1
+  className="font-bold tracking-wide cursor-pointer select-none flex items-center gap-2"
+  onClick={() => {
+    window.dispatchEvent(new Event("reset-home"));
+    navigate("/home");
+  }}
+>
+  <img
+    src={logo}
+    alt="StoryGenix Logo"
+    className="h-10 w-auto"
+  /><span>StoryGenix</span>
+</h1>
 
-
-      >
-        🎬 StoryGenix
-      </h1>
 
       <div className="relative" ref={dropdownRef}>
         <FaUserCircle

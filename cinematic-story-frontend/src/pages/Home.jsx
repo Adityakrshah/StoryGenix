@@ -288,7 +288,7 @@ const handleEditScript = async () => {
       onClick={() => setEditing(true)}
       className="text-sm text-blue-400 hover:underline"
     >
-      ✏️ Re-write this script
+      Edit Script
     </button>
     <button
   onClick={() => copyToClipboard(script)}
